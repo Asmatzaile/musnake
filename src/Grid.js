@@ -10,6 +10,10 @@ export class Grid {
         this.ctx = ctx;
         this.snake = new Snake(this.cols/2, this.rows/2, this);
     }
+
+    update() {
+        this.snake.step();
+    }
     
     display() {
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);

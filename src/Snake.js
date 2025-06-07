@@ -31,6 +31,7 @@ class SnakeCell extends Cell {
 
 export class Snake {
     cells = []
+    direction = {x: 0, y: -1};
 
     constructor(x, y, grid) {
         this.grid = grid;
@@ -42,17 +43,8 @@ export class Snake {
         return this.cells[0];
     }
 
-    up() {
-        this.head.moveRel(this.grid, {y:-1});
-    }
-    right() {
-        this.head.moveRel(this.grid, {x: 1});
-    }
-    down() {
-        this.head.moveRel(this.grid, {y: 1});
-    }
-    left() {
-        this.head.moveRel(this.grid, {x:-1});
+    step() {
+        this.head.moveRel(this.grid, this.direction);
     }
 
     display() {

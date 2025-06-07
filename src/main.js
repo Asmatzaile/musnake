@@ -1,4 +1,5 @@
 import './style.css'
+import * as Tone from "tone";
 import { Grid } from './Grid';
 
 const canvas = document.getElementById('app');
@@ -13,22 +14,35 @@ function tick() {
 }
 requestAnimationFrame(tick)
 
+canvas.style.cursor = "pointer"
+canvas.addEventListener("pointerdown", async() =>{
+    canvas.style.cursor = "default"
+    await Tone.start();
+    const synth = new Tone.Synth().toDestination();
+    const loop = new Tone.Loop(time => {
+        if (Math.random()>0.5) synth.triggerAttackRelease("C4", 0.01, time)
+        grid.update();
+    }, 0.1);
+    loop.start(0);
+    Tone.getTransport().start();
+}, {once: true})
+
 const actions = {
     STEER_UP: {
         key: 'ArrowUp',
-        action: () => snake.up(),
+        action: () => snake.direction = {y: -1},
     },
     STEER_RIGHT: {
         key: 'ArrowRight',
-        action: () => snake.right(),
+        action: () => snake.direction = {x: 1},
     },
     STEER_DOWN: {
         key: 'ArrowDown',
-        action: () => snake.down(),
+        action: () => snake.direction = {y: 1},
     },
     STEER_LEFT: {
         key: 'ArrowLeft',
-        action: () => snake.left(),
+        action: () => snake.direction = {x: -1},
     },
 }
 
