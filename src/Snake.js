@@ -1,55 +1,74 @@
-export class Cell {
-    display(ctx, xCenter, yCenter, w, h) {
-        const x = xCenter - w*0.5;
-        const y = yCenter - h*0.5;
-        ctx.fillRect(x, y, w, h);
-    }
-}
+import { Cell } from "./Cell";
 
 class SnakeCell extends Cell {
-    pos = {x: undefined, y: undefined};
 
-    constructor(pos) {
-        super();
-        this.pos = pos;
-    }
-    
     moveAbs(newPos) {
-        this.pos = newPos
+        if (this.previousCell) this.previousCell.moveAbs(this.pos);
+        if (this.stomachContents) {
+            if (this.previousCell) this.previousCell.stomachContents = this.stomachContents;
+            else this.previousCell = new SnakeCell(this.pos)
+            this.stomachContents = undefined;
+        }
+        this.pos = newPos;
     }
     moveRel(grid, rel) {
-        this.pos = grid.getCoordSum(this.pos, rel)
+        const newPos = grid.getCoordSum(this.pos, rel);
+        this.moveAbs(newPos);
     }
 
     display(ctx, w, h) {
-        const xCenter = (this.pos.x+0.5) * w;
-        const yCenter = (this.pos.y+0.5) * h;
         ctx.fillStyle = "white"
-        super.display(ctx, xCenter, yCenter, w, h)
+        const scale = this.stomachContents ? 1.2 : 1;
+        super.display(ctx, w, h, scale)
     }
 }
 
 export class Snake {
-    cells = []
-    direction = {x: 0, y: -1};
+    _direction = {x: 0, y: -1};
+    directionQueue = [];
+
+    set direction({x=0, y=0}) {
+        const lastDirection = this.directionQueue[this.directionQueue.length-1] ?? this._direction;
+        const xChange = Math.abs(x-lastDirection.x);
+        const yChange = Math.abs(y-lastDirection.y);
+        const isValid = xChange+yChange !== 0 && ((xChange < 2 && yChange < 2) || this.length === 1)
+        if (isValid) this.directionQueue.push({x,  y});
+    }
 
     constructor(x, y, grid) {
         this.grid = grid;
-        const head = new SnakeCell({x,y});
-        this.cells.push(head);
+        this.head = new SnakeCell({x,y});
     }
 
-    get head() {
-        return this.cells[0];
+    get cells() {
+        const cells = [this.head];
+        let current = this.head;
+        while(current.previousCell) {
+            current = current.previousCell;
+            cells.push(current);
+        };
+        return cells;
+    }
+
+    get length() {
+        return this.cells.length;
     }
 
     step() {
-        this.head.moveRel(this.grid, this.direction);
+        this._direction = this.directionQueue.shift() ?? this._direction;
+        this.head.moveRel(this.grid, this._direction);
+        const item = this.grid.getItemAtPos(this.head.pos);
+        if (item) this.eat(item);
     }
 
-    display() {
+    eat(food) {
+        this.head.stomachContents = food;
+        food.beEaten();
+    }
+
+    display(ctx) {
         const cellW = this.grid.cellW;
         const cellH = this.grid.cellH;
-        this.cells.forEach(cell => cell.display(this.grid.ctx, cellW, cellH));
+        this.cells.forEach(cell => cell.display(ctx, cellW, cellH));
     }
 }
