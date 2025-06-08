@@ -1,6 +1,6 @@
 import './style.css'
-import * as Tone from "tone";
 import { Grid } from './Grid';
+import { Sequencer } from './Sequencer';
 import { Drum } from './Drum';
 import { getACoprime, euclid, choose } from './utils';
 
@@ -11,12 +11,17 @@ const grid = new Grid(ctx);
 const snake = grid.snake;
 
 
-function tick() {
+function draw() {
     grid.display();
-    requestAnimationFrame(tick);
+    requestAnimationFrame(draw);
 }
-requestAnimationFrame(tick)
+requestAnimationFrame(draw);
 
+function tick(audiotime) {
+    grid.update(audiotime);
+}
+
+const sequencer = new Sequencer();
 // 6 is not a good number as it is not coprime with any number
 // greater than 1 and smaller than itself-1 (i.e. 2, 3 or 4)
 const seq1Len = choose([5, 7, 8, 9, 10, 11]);
@@ -28,18 +33,13 @@ const drum1 = new Drum(Drum.type.BASS);
 drum1.sequence = seq1
 const drum2 = new Drum(Drum.type.MID);
 drum2.sequence = seq2;
+sequencer.addInstrument(drum1);
+sequencer.addInstrument(drum2);
 
 canvas.style.cursor = "pointer";
 canvas.addEventListener("pointerdown", async() =>{
-    canvas.style.cursor = "default"
-    await Tone.start();
-    const loop = new Tone.Loop(time => {
-        drum1.step(time);
-        drum2.step(time);
-        grid.update();
-    }, 0.1);
-    loop.start(0);
-    Tone.getTransport().start();
+    canvas.style.cursor = "default";
+    sequencer.start(time => tick(time));
 }, {once: true})
 
 const actions = {

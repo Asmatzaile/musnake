@@ -1,17 +1,12 @@
 import { Cell } from "./Cell";
+import { randInt } from "./utils";
 
 export class Food extends Cell {
 
     constructor(pos, remove) {
         super(pos);
         this.remove = remove;
-    }
-
-    moveAbs(newPos) {
-        this.pos = newPos
-    }
-    moveRel(grid, rel) {
-        this.pos = grid.getCoordSum(this.pos, rel)
+        this.midinote = randInt(60, 72);
     }
 
     display(ctx, w, h) {

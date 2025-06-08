@@ -1,4 +1,4 @@
-import { posMod, randInt, choose } from "./utils";
+import { posMod, choose } from "./utils";
 import { Snake } from "./Snake";
 import { Food } from "./Food";
 
@@ -14,8 +14,8 @@ export class Grid {
         document.addEventListener('foodEaten', () => this.onFoodEaten());
     }
 
-    update() {
-        this.snake.step();
+    update(audiotime) {
+        this.snake.step(audiotime);
     }
     
     display() {
