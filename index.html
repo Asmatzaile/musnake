@@ -9,6 +9,14 @@
   </head>
   <body>
     <h1>Musnake</h1>
-    <canvas width="640" height="480" id="app"></canvas>
+    <canvas style="touch-action:none" width="640" height="480" id="app"></canvas>
+    <div style="touch-action:none" id="directional-buttons">
+      <button data-action="STEER_RIGHT" data-start-turn="0" id="btn-right">►</button>
+      <button data-action="STEER_DOWN" data-start-turn="0.25" id="btn-down">▼</button>
+      <button data-action="STEER_LEFT" data-start-turn="0.5" id="btn-left">◄</button>
+      <button data-action="STEER_UP" data-start-turn="0.75" id="btn-up">▲</button>
+      <button id="circle"></button>
+    </div>
+    <button id="start-btn"><span>Start</span></button>
   </body>
 </html>

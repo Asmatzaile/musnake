@@ -3,6 +3,7 @@ import { Grid } from './Grid';
 import { Sequencer } from './Sequencer';
 import { Drum } from './Drum';
 import { getACoprime, euclid, choose } from './utils';
+import { createDirectionalController } from './createDirectionalController';
 
 const canvas = document.getElementById('app');
 const ctx = canvas.getContext("2d");
@@ -46,10 +47,11 @@ document.addEventListener('snakeDied', () =>{
     setTimeout(()=>snake = grid.snake, 10)
 });
 
-canvas.style.cursor = "pointer";
-canvas.addEventListener("pointerdown", async() =>{
-    canvas.style.cursor = "default";
+
+const startBtn = document.querySelector('#start-btn');
+startBtn.addEventListener("click", ()=> {
     sequencer.start(time => tick(time));
+    startBtn.remove();
 }, {once: true})
 
 const actions = {
@@ -71,6 +73,7 @@ const actions = {
     },
 }
 
+createDirectionalController(actions);
 document.addEventListener('keydown', (e) => {
     [...Object.entries(actions)].forEach(([_name, info]) => {
         if (info.key === e.key) {

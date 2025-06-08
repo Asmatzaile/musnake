@@ -21,3 +21,74 @@ canvas {
     border: 2px solid white;
     max-width: 100%;
 }
+
+#directional-buttons {
+    display: grid;
+    width: 200px;
+    height: 200px;
+    grid-template-areas:
+        "....  up  ....."
+        "left circle right"
+        ".... down .....";
+
+    button {
+        cursor: pointer;
+        color: white;
+        font-size: 20px;
+        border: 2px solid;
+        background: black;
+        &.clicked {
+            color: black;
+            background: white;
+        }
+    }
+    #btn-up {
+        grid-area: up;
+    };
+    #btn-left {
+        grid-area: left;
+    }
+    #btn-right {
+        grid-area: right;
+    }
+    #btn-down {
+        grid-area: down;
+    }
+    #circle {
+        grid-area: circle;
+        border-radius: 99999px;
+        scale: 0.5;
+        background-color: white;
+    }
+}
+
+#start-btn {
+    position: absolute;
+    inset: 0;
+    width: 100dvw;
+    height: 100dvh;
+    text-transform: uppercase;
+    background: black;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 40px;
+    & span {
+        animation: 1s linear infinite blink;
+    }
+}
+
+@keyframes blink {
+    0% {
+        opacity: 1;
+    }
+    49% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 0;
+    }
+}

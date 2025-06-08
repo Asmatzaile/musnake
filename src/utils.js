@@ -2,6 +2,12 @@ export const posMod = (n, mod) => (n % mod + mod) % mod;
 
 export const lerp = (t, a, b) => a + t * (b - a);
 
+export const poltocar = (r, theta) => {
+    const x = r * Math.cos(theta);
+    const y = r * Math.sin(theta);
+    return [x, y];
+}
+
 const gcd = (a, b) => {
     if (b === 0) return a;
     else return gcd(b, (a%b));
