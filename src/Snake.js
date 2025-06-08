@@ -9,7 +9,7 @@ class SnakeCell extends Cell {
         if (this.head === this) this.willPlay = true;
         this.midinote = midinote ?? randInt(60, 72);
         this.ampEnv = new Tone.AmplitudeEnvelope({attack: 0.001, decay: 0, sustain: 1, release: 0.05}).toDestination();
-        new Tone.Oscillator(Tone.Midi(this.midinote).toFrequency(), "sine").connect(this.ampEnv).start();
+        this.osc = new Tone.Oscillator(Tone.Midi(this.midinote).toFrequency(), "sine").connect(this.ampEnv).start();
     }
 
     moveAbs(newPos, grid) {
@@ -61,12 +61,17 @@ class SnakeCell extends Cell {
     play(time) {
         this.ampEnv.triggerAttackRelease(0.05, time);
     }
+
+    destroy() {
+        if (this.previousCell) this.previousCell.destroy();
+        this.osc.dispose();
+        this.ampEnv.dispose();
+    }
 }
 
 export class Snake {
     _direction = {x: 0, y: -1};
     directionQueue = [];
-    stepN = -1;
 
     set direction({x=0, y=0}) {
         const lastDirection = this.directionQueue[this.directionQueue.length-1] ?? this._direction;
@@ -96,19 +101,23 @@ export class Snake {
     }
 
     step(audiotime) {
-        this.stepN++;
         this.head.audiotime = audiotime;
         this.move();
         const item = this.grid.getItemAtPos(this.head.pos);
         this.eat(item);
-        if (this.stepN % 2 === 0) this.head.sequenceStep();
     }
 
     eat(item) {
         if (!item) return this.head.digest(item, this.grid);
+        if (item instanceof SnakeCell) return this.die();
         const { midinote } = item;
         this.head.digest(new SnakeCell({midinote}), this.grid);
         if (item) item.beEaten();
+    }
+
+    die() {
+        document.dispatchEvent(new Event('snakeDied'));
+        this.head.destroy();
     }
 
     move() {

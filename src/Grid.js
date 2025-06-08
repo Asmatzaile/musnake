@@ -6,16 +6,19 @@ export class Grid {
     cols = 32;
     rows = 24;
     items = new Set();
+    stepN = -1;
 
     constructor(ctx) {
         this.ctx = ctx;
         this.snake = new Snake(this.cols/2, this.rows/2, this);
         this.makeFood();
         document.addEventListener('foodEaten', () => this.onFoodEaten());
+        document.addEventListener('snakeDied', () => this.snake = new Snake(this.cols/2, this.rows/2, this));
     }
 
     update(audiotime) {
         this.snake.step(audiotime);
+        if (++this.stepN % 2 === 0) this.snake.head.sequenceStep();
     }
     
     display() {
@@ -66,7 +69,7 @@ export class Grid {
     }
 
     getItemAtPos({x, y}) {
-        return Array.from(this.items).find(el => el.pos.x === x && el.pos.y === y);
+        return [...this.items].concat(this.snake.cells.slice(1)).find(el => el.pos.x === x && el.pos.y === y);
     }
 
 

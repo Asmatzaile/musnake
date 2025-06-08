@@ -14,9 +14,15 @@ export class Drum {
     
     constructor(type) {
         this._sequence = new Sequence();
-        const sample = choose(samples[[this.bank, choose(type)].join("_")]);
+        this.type = type;
+        this.player = new Player().toDestination();
+        this.chooseSample();
+    }
+
+    chooseSample() {
+        const sample = choose(samples[[this.bank, choose(this.type)].join("_")]);
         const url = samples._base + sample;
-        this.player = new Player(url).toDestination();
+        this.player.load(url);
     }
 
     set sequence(steps) {
