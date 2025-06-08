@@ -1,6 +1,6 @@
 import * as Tone from "tone";
 import { Cell } from "./Cell";
-import { randInt } from "./utils";
+import { lerp, randInt } from "./utils";
 class SnakeCell extends Cell {
 
     constructor({head, pos, midinote}) {
@@ -37,7 +37,7 @@ class SnakeCell extends Cell {
         const { midinote } = this.stomachContents;
         const previous = this.previousCell;
         const pos = previous ? previous.pos : grid.getCoordSum(this.pos, {x: this.direction.x*-1, y: this.direction.y*-1})
-        const newCell = new SnakeCell({head: this.head, pos, midinote });
+        const newCell = new SnakeCell({ head: this.head, pos, midinote });
         this.previousCell = newCell;
         newCell.play(this.head.audiotime);
     }
@@ -51,7 +51,9 @@ class SnakeCell extends Cell {
     }
 
     display(ctx, w, h) {
-        ctx.fillStyle = "white"
+        const y = Math.pow(this.ampEnv.value, 0.1);
+        const color = lerp(y, 0.5, 1) * 255;
+        ctx.fillStyle = `rgb(${color} ${color} ${color})`
         const scale = this.stomachContents ? 1.2 : 1;
         super.display(ctx, w, h, scale)
     }
