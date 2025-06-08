@@ -5,11 +5,19 @@
     <link rel="icon" type="image/svg+xml" href="/musnake/musnake.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Musnake</title>
-    <script type="module" crossorigin src="/musnake/assets/index-DK0WxYq1.js"></script>
-    <link rel="stylesheet" crossorigin href="/musnake/assets/index-DUUzWZRE.css">
+    <script type="module" crossorigin src="/musnake/assets/index-BmHd8Wb0.js"></script>
+    <link rel="stylesheet" crossorigin href="/musnake/assets/index-Bnu8LaiV.css">
   </head>
   <body>
     <h1>Musnake</h1>
-    <canvas width="640" height="480" id="app"></canvas>
+    <canvas style="touch-action:none" width="640" height="480" id="app"></canvas>
+    <div style="touch-action:none" id="directional-buttons">
+      <button data-action="STEER_RIGHT" data-start-turn="0" id="btn-right">►</button>
+      <button data-action="STEER_DOWN" data-start-turn="0.25" id="btn-down">▼</button>
+      <button data-action="STEER_LEFT" data-start-turn="0.5" id="btn-left">◄</button>
+      <button data-action="STEER_UP" data-start-turn="0.75" id="btn-up">▲</button>
+      <button id="circle"></button>
+    </div>
+    <button id="start-btn"><span>Start</span></button>
   </body>
 </html>
