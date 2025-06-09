@@ -34,10 +34,11 @@ class SnakeCell extends Cell {
     }
 
     grow(grid) {
-        const { midinote } = this.stomachContents;
         const previous = this.previousCell;
-        const pos = previous ? previous.pos : grid.getCoordSum(this.pos, {x: this.direction.x*-1, y: this.direction.y*-1})
-        const newCell = new SnakeCell({ head: this.head, pos, midinote });
+        const newCell = this.stomachContents;
+        newCell.head = this.head;
+        newCell.pos = previous ? previous.pos : grid.getCoordSum(this.pos, {x: this.direction.x*-1, y: this.direction.y*-1});
+        newCell.willPlay = false;
         this.previousCell = newCell;
         newCell.play(this.head.audiotime);
     }
