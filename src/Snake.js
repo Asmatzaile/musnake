@@ -150,6 +150,8 @@ export class Snake {
         this.grid.invert(this.nirvana);
         if (this.nirvana) this.head.stopPlaying();
         else this.head.willPlay = true;
+        if (this.nirvana) document.dispatchEvent(new Event("modeNirvana"));
+        else document.dispatchEvent(new Event("modeNormal"));
         
     }
 

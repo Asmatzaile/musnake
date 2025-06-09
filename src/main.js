@@ -1,8 +1,6 @@
 import './style.css'
 import { Grid } from './Grid';
-import { Sequencer } from './audio/Sequencer';
-import { Drum } from './audio/Drum';
-import { getACoprime, euclid, choose } from './utils';
+import { Conductor } from './audio/Conductor';
 import { createDirectionalController } from './createDirectionalController';
 
 const canvas = document.getElementById('app');
@@ -22,35 +20,15 @@ function tick(audiotime) {
     grid.update(audiotime);
 }
 
-const sequencer = new Sequencer();
-// 6 is not a good number as it is not coprime with any number
-// greater than 1 and smaller than itself-1 (i.e. 2, 3 or 4)
-function newDrumSequences() {
-    const seq1Len = choose([5, 7, 8, 9, 10, 11]);
-    const seq2Len = getACoprime(seq1Len, 5, 12, {skip: 6});
-    const seq1 = euclid(getACoprime(seq1Len, Math.min(seq1Len - 3, 3), seq1Len-1), seq1Len);
-    const seq2 = euclid(getACoprime(seq2Len, Math.min(seq2Len - 3, 3), seq2Len-1), seq2Len);
-    drum1.sequence = seq1;
-    drum2.sequence = seq2;
-}
-
-
-const drum1 = new Drum(Drum.type.BASS);
-const drum2 = new Drum(Drum.type.MID);
-newDrumSequences();
-sequencer.addInstrument(drum1);
-sequencer.addInstrument(drum2);
 document.addEventListener('snakeDied', () =>{
-    newDrumSequences();
-    drum1.chooseSample();
-    drum2.chooseSample();
     setTimeout(()=>snake = grid.snake, 10)
 });
 
 
+const conductor = new Conductor();
 const startBtn = document.querySelector('#start-btn');
 startBtn.addEventListener("click", ()=> {
-    sequencer.start(time => tick(time));
+    conductor.start(time => tick(time));
     startBtn.remove();
 }, {once: true})
 
