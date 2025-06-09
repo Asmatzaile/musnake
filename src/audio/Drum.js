@@ -2,7 +2,7 @@
 import { Player } from 'tone';
 import { Sequence } from './Sequence';
 import samples from "./samples.json"
-import { choose } from './utils';
+import { choose } from '../utils';
 
 export class Drum {
     bank = "RolandTR808";

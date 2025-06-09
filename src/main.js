@@ -1,7 +1,7 @@
 import './style.css'
 import { Grid } from './Grid';
-import { Sequencer } from './Sequencer';
-import { Drum } from './Drum';
+import { Sequencer } from './audio/Sequencer';
+import { Drum } from './audio/Drum';
 import { getACoprime, euclid, choose } from './utils';
 import { createDirectionalController } from './createDirectionalController';
 

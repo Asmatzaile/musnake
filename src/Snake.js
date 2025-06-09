@@ -8,8 +8,7 @@ class SnakeCell extends Cell {
         this.head = head ?? this;
         if (this.head === this) this.willPlay = true;
         this.midinote = midinote ?? randInt(60, 72);
-        this.ampEnv = new Tone.AmplitudeEnvelope({attack: 0.001, decay: 0, sustain: 1, release: 0.05}).toDestination();
-        this.osc = new Tone.Oscillator(Tone.Midi(this.midinote).toFrequency(), "sine").connect(this.ampEnv).start();
+        this.synth = new Tone.Synth({oscillator: {type: "sine"}, envelope: {attack: 0.001, decay: 0, sustain: 1, release: 0.05}}).toDestination();
     }
 
     moveAbs(newPos, grid) {
@@ -61,7 +60,7 @@ class SnakeCell extends Cell {
     }
 
     display(ctx, w, h) {
-        const y = Math.pow(this.ampEnv.value, 0.1);
+        const y = Math.pow(this.synth.envelope.value, 0.1);
         const color = lerp(y, 0.5, 1) * 255;
         ctx.fillStyle = `rgb(${color} ${color} ${color})`
         const scale = this.stomachContents ? 1.2 : 1;
@@ -69,13 +68,12 @@ class SnakeCell extends Cell {
     }
 
     play(time) {
-        this.ampEnv.triggerAttackRelease(0.05, time);
+        this.synth.triggerAttackRelease(Tone.Midi(this.midinote), 0.05, time);
     }
 
     destroy() {
         if (this.previousCell) this.previousCell.destroy();
-        this.osc.dispose();
-        this.ampEnv.dispose();
+        this.synth.dispose();
     }
 
     stopPlaying() {
