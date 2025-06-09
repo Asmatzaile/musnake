@@ -18,7 +18,22 @@ export const randInt = (a, b) => {
     return Math.floor(Math.random() * (max - min)) + min;
 }
 
-export const choose = array => array[randInt(array.length)];
+export const choose = (array, {weights}={}) => weights ? wchoose(array, weights) : array[randInt(array.length)];
+
+// based on https://github.com/trekhleb/javascript-algorithms/tree/master/src/algorithms/statistics/weighted-random
+const wchoose = (items, weights) => {
+    if (items.length !== weights.length) throw new Error('Items and weights must be of the same size');
+    if (!items.length) throw new Error('Items must not be empty');
+
+    const totalWeight = weights.reduce((sum, weight) => sum + weight, 0); // Calculate the total sum of weights.
+    const threshold = totalWeight * Math.random();
+
+    let cumulative = 0;
+    for (let i = 0; i < items.length; i++) {
+      cumulative += weights[i];
+      if (cumulative >= threshold) return items[i];
+    }
+}
 
 const rotateArray = (array, rotation) => {
     const n = array.length;

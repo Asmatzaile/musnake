@@ -17,12 +17,13 @@ export class Grid {
     }
 
     update(audiotime) {
-        this.snake.step(audiotime);
+        this.snake.sequenceStep(audiotime);
         if (++this.stepN % 2 === 0) this.snake.head.sequenceStep();
     }
     
     display() {
-        this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        this.ctx.fillStyle = "black";
+        this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         const cellW = this.cellW;
         const cellH = this.cellH;
         this.snake.display(this.ctx);
@@ -75,10 +76,13 @@ export class Grid {
 
     makeFood() {
         const remove = () => this.items.delete(food);
-        const food = new Food(this.getRandomEmptyPos(), remove);
+        const food = new Food({pos: this.getRandomEmptyPos(), remove});
         this.items.add(food);
     }
     onFoodEaten() {
         this.makeFood();
+    }
+    invert(inverted) {
+        this.ctx.canvas.style.filter = `invert(${+inverted})`;
     }
 }

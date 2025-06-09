@@ -22,15 +22,24 @@ class SnakeCell extends Cell {
         this.moveAbs(newPos, grid);
     }
 
+    eat(content) {
+        if (this !== this.head) console.error("Trying to eat while not head!");
+        this.stomachContents = content;
+        this.playStomachContents();
+    }
+
     digest(newContents, grid) {
         const previous = this.previousCell;
         if (previous) previous.digest(this.stomachContents, grid);
         else if (this.stomachContents) this.grow(grid);
         this.stomachContents = newContents;
-        if (this.stomachContents) {
-            this.play(this.head.audiotime);
-            this.stomachContents.play(this.head.audiotime);
-        }
+        this.playStomachContents();
+    }
+    
+    playStomachContents() {
+        if (!this.stomachContents) return;
+        this.play(this.head.audiotime);
+        this.stomachContents.play(this.head.audiotime);
     }
 
     grow(grid) {
@@ -68,18 +77,30 @@ class SnakeCell extends Cell {
         this.osc.dispose();
         this.ampEnv.dispose();
     }
+
+    stopPlaying() {
+        if (this.previousCell) this.previousCell.stopPlaying();
+        this.willPlay = false;
+    }
 }
 
 export class Snake {
     _direction = {x: 0, y: -1};
     directionQueue = [];
+    nirvana = false;
 
     set direction({x=0, y=0}) {
         const lastDirection = this.directionQueue[this.directionQueue.length-1] ?? this._direction;
         const xChange = Math.abs(x-lastDirection.x);
         const yChange = Math.abs(y-lastDirection.y);
-        const isValid = xChange+yChange !== 0 && ((xChange < 2 && yChange < 2) || this.length === 1)
-        if (isValid) this.directionQueue.push({x,  y});
+        const isValid = ((xChange < 2 && yChange < 2) || this.length === 1)
+        if (!isValid) return;
+        if (this.nirvana) {
+            this._direction = {x, y};
+            this.step();
+            return;
+        }
+        if (xChange+yChange !== 0) this.directionQueue.push({x,  y});
     }
 
     constructor(x, y, grid) {
@@ -101,24 +122,37 @@ export class Snake {
         return this.cells.length;
     }
 
-    step(audiotime) {
+    sequenceStep(audiotime) {
         this.head.audiotime = audiotime;
+        this.head.digest(undefined, this.grid);
+        if (!this.nirvana) this.step();
+    }
+
+    step() {
         this.move();
         const item = this.grid.getItemAtPos(this.head.pos);
         this.eat(item);
     }
 
     eat(item) {
-        if (!item) return this.head.digest(item, this.grid);
+        if (!item) return;
         if (item instanceof SnakeCell) return this.die();
         const { midinote } = item;
-        this.head.digest(new SnakeCell({midinote}), this.grid);
-        if (item) item.beEaten();
+        this.head.eat(new SnakeCell({midinote}), this.grid);
+        if (item) item.beEaten(this);
     }
 
     die() {
         document.dispatchEvent(new Event('snakeDied'));
         this.head.destroy();
+    }
+
+    toggleNirvana() {
+        this.nirvana = !this.nirvana;
+        this.grid.invert(this.nirvana);
+        if (this.nirvana) this.head.stopPlaying();
+        else this.head.willPlay = true;
+        
     }
 
     move() {

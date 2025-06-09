@@ -6,8 +6,18 @@ function setAbortableInterval(callback, interval, {signal}) {
     callback();
   }, interval);
 
-  // Automatically clear on abort
   signal.addEventListener('abort', () => clearInterval(id));
+
+  return id;
+}
+
+function setAbortableTimeout(callback, ms, {signal}) {
+  const id = setTimeout(() => {
+    if (signal.aborted) return clearTimeout(id);
+    callback();
+  }, ms);
+
+  signal.addEventListener('abort', () => clearTimeout(id));
 
   return id;
 }
@@ -18,7 +28,7 @@ function clickButton(button) {
     button.classList.add("clicked")
     button.click();
     signal.addEventListener("abort", () => button.classList.remove("clicked"))
-    setAbortableInterval(() => button.click(), 100, { signal });
+    setAbortableTimeout(() => setAbortableInterval(() => button.click(), 30, { signal }), 500, { signal });
     button.addEventListener("pointerup", () => controller.abort(), { signal });
     button.addEventListener("pointerleave", () => controller.abort(), { signal });
     return controller;
